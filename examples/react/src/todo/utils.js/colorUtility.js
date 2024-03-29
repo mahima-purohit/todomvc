@@ -9,15 +9,15 @@
  */
 
 export function updateColorsOfCheckedTodo(state) {
-    return state.map(todo => {
+    return state.map((todo, index) => {
         if (todo.completed) {
-            if (todo.completionOrder === 0) {
+            if (todo.completionOrder === 1) {
                 todo.checkedColor = "green";
             }
-            else if (todo.completionOrder === 1) {
+            else if (todo.completionOrder === 2) {
                 todo.checkedColor = "magenta";
             }
-            else if (todo.completionOrder === 2) {
+            else if (todo.completionOrder === 3) {
                 todo.checkedColor = "yellow";
             }
             else {
@@ -27,3 +27,6 @@ export function updateColorsOfCheckedTodo(state) {
         return todo;
     })
 }
+//Task-3
+
+

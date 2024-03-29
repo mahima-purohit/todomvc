@@ -4,6 +4,11 @@ import { ADD_ITEM, UPDATE_ITEM, REMOVE_ITEM, TOGGLE_ITEM, REMOVE_ALL_ITEMS, TOGG
  * Import the Utility function
  */
 import { updateColorsOfCheckedTodo } from "./utils.js/colorUtility";
+/**
+ * ******************TASK-3 STEP-2:*********************************
+ * Import the Utility function
+ */
+import { updateTimesOfCheckedTodo } from "./utils.js/timestampUtility"
 
 
 
@@ -57,10 +62,22 @@ function nanoid(size = 21) {
  *  ii)Call the "updateColorsOfCheckedTodo" utility function within the reducer after handling each action that might affect the completion status of tasks.
  *  iii)Update the state with the new color information for completed tasks.
  */
+/**
+ *  *****************************TASK-2, STEP-3**************************
+ * Modifid the reducer logic to integrate the timeStamp() with the todo.
+ * 
+ */
 export const todoReducer = (state, action) => {
     switch (action.type) {
         case ADD_ITEM:
-            return updateColorsOfCheckedTodo(state.concat({ id: nanoid(), title: action.payload.title, completed: false, completionOrder: state.filter(todo => todo.completed).length }));
+            return updateColorsOfCheckedTodo(
+                updateTimesOfCheckedTodo(
+                    state.concat({
+                        id: nanoid(),
+                        title: action.payload.title,
+                        completed: false,
+                        completionOrder: state.filter(todo => todo.completed).length,
+                    })));
         case UPDATE_ITEM:
             return updateColorsOfCheckedTodo(state.map((todo) => (todo.id === action.payload.id ? { ...todo, title: action.payload.title } : todo)));
         case REMOVE_ITEM:
@@ -70,10 +87,10 @@ export const todoReducer = (state, action) => {
             const toggledIndex = state.indexOf(toggledItem);
             const updatedState = [...state];
             updatedState[toggledIndex] = { ...toggledItem, completed: !toggledItem.completed };
-            const newState = updateColorsOfCheckedTodo(updatedState.map((todo, index) => ({
+            const newState = updateColorsOfCheckedTodo(updateTimesOfCheckedTodo(updatedState.map((todo, index) => ({
                 ...todo,
                 completionOrder: todo.completed ? (index < toggledIndex ? todo.completionOrder : todo.completionOrder + 1) : todo.completionOrder
-            })));
+            }))));
             return newState;
         // return state.map((todo) => (todo.id === action.payload.id ? { ...todo, completed: !todo.completed } : todo));
         case REMOVE_ALL_ITEMS:
@@ -81,8 +98,8 @@ export const todoReducer = (state, action) => {
             return updateColorsOfCheckedTodo([]);
         case TOGGLE_ALL:
             const allCompleted = action.payload.completed;
-            return updateColors(state.map(todo => ({ ...todo, completed: allCompleted })));
-        // return state.map((todo) => (todo.completed !== action.payload.completed ? { ...todo, completed: action.payload.completed } : todo));
+            // return updateColors(state.map(todo => ({ ...todo, completed: allCompleted })));
+            return state.map((todo) => (todo.completed !== action.payload.completed ? { ...todo, completed: action.payload.completed } : todo));
         case REMOVE_COMPLETED_ITEMS:
             return updateColors(state.filter((todo) => !todo.completed));
         // return state.filter((todo) => !todo.completed);

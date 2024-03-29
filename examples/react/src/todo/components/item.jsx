@@ -16,7 +16,11 @@ export const Item = memo(function Item({ todo, dispatch, index }) {
 	 * **************************TASK-2, STEP-3*********************
 	 * Extract the checkedColor property form the todo object and apply it on label
 	 */
-	const { title, completed, id, checkedColor } = todo;
+	/**
+	 * **************************TASK-2, STEP-4*********************
+	 * Extract the addedTime and completedTime properties form the todo object and apply it on label
+	 */
+	const { title, completed, id, checkedColor, addedTime, completedTime } = todo;
 	/**
 	 * Task-1 Step-2:
 	 *  i) Used the useEffect hook to trigger actions when the component mounts or when the title of the todo item changes.
@@ -61,7 +65,7 @@ export const Item = memo(function Item({ todo, dispatch, index }) {
 	);
 	const updateItem = useCallback(
 		(id, title) => dispatch({ type: UPDATE_ITEM, payload: { id, title } }),
-		[dispatch]
+		[dispatch, id]
 	);
 
 	const handleDoubleClick = useCallback(() => {
@@ -98,7 +102,13 @@ export const Item = memo(function Item({ todo, dispatch, index }) {
 						onBlur={handleBlur}
 					/>
 				) : (
-					<>
+					<div
+						style={{
+							display: "flex",
+							// justifyContent: "space-between",
+							alignItems: "center",
+						}}
+					>
 						<input
 							className="toggle"
 							type="checkbox"
@@ -112,6 +122,9 @@ export const Item = memo(function Item({ todo, dispatch, index }) {
                             Rendered the todo item label with the dynamic color style.
                          * ******************TASK-2, STEP-4:*************************
                          * Change the label styling based on it's status of completion
+                         * ******************TASK-3, STEP-5:*************************
+                         * Add the two columns and render the time stamps ", "addedTime" 
+                         * and completedTime"
                          */
 							// style={{ color: color }}
 							style={{ color: completed ? checkedColor : color }}
@@ -120,12 +133,25 @@ export const Item = memo(function Item({ todo, dispatch, index }) {
 						>
 							{title}
 						</label>
+						<span
+							className="added-time"
+							style={{ marginLeft: "30px", fontSize: 12 }}
+						>
+							{addedTime}
+						</span>
+						<span
+							className="completed-time"
+							style={{ fontSize: 12, marginLeft: "30px" }}
+						>
+							{completed ? completedTime : ""}
+							{/* hello */}
+						</span>
 						<button
 							className="destroy"
 							data-testid="todo-item-button"
 							onClick={removeItem}
 						/>
-					</>
+					</div>
 				)}
 			</div>
 		</li>
