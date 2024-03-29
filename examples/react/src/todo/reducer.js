@@ -1,4 +1,11 @@
 import { ADD_ITEM, UPDATE_ITEM, REMOVE_ITEM, TOGGLE_ITEM, REMOVE_ALL_ITEMS, TOGGLE_ALL, REMOVE_COMPLETED_ITEMS } from "./constants";
+/**
+ * ******************TASK-2 STEP-2:*********************************
+ * Import the Utility function
+ */
+import { updateColorsOfCheckedTodo } from "./utils.js/colorUtility";
+
+
 
 /* Borrowed from https://github.com/ai/nanoid/blob/3.0.2/non-secure/index.js
 
@@ -41,23 +48,44 @@ function nanoid(size = 21) {
     }
     return id;
 }
-
+/**
+ * TASK-2, STEP-3
+ *  Integrate the color logic to the reducer
+ *  i)Extend the state of todo with one more property calles "completionOrder", which refers to the order in which
+ *    tasks are marked as completed relative to each other. It is a numeric value  assigned to each completed task
+ *    to determine its position in the completion sequence.
+ *  ii)Call the "updateColorsOfCheckedTodo" utility function within the reducer after handling each action that might affect the completion status of tasks.
+ *  iii)Update the state with the new color information for completed tasks.
+ */
 export const todoReducer = (state, action) => {
     switch (action.type) {
         case ADD_ITEM:
-            return state.concat({ id: nanoid(), title: action.payload.title, completed: false });
+            return updateColorsOfCheckedTodo(state.concat({ id: nanoid(), title: action.payload.title, completed: false, completionOrder: state.filter(todo => todo.completed).length }));
         case UPDATE_ITEM:
-            return state.map((todo) => (todo.id === action.payload.id ? { ...todo, title: action.payload.title } : todo));
+            return updateColorsOfCheckedTodo(state.map((todo) => (todo.id === action.payload.id ? { ...todo, title: action.payload.title } : todo)));
         case REMOVE_ITEM:
-            return state.filter((todo) => todo.id !== action.payload.id);
+            return updateColorsOfCheckedTodo(state.filter((todo) => todo.id !== action.payload.id));
         case TOGGLE_ITEM:
-            return state.map((todo) => (todo.id === action.payload.id ? { ...todo, completed: !todo.completed } : todo));
+            const toggledItem = state.find(todo => todo.id === action.payload.id);
+            const toggledIndex = state.indexOf(toggledItem);
+            const updatedState = [...state];
+            updatedState[toggledIndex] = { ...toggledItem, completed: !toggledItem.completed };
+            const newState = updateColorsOfCheckedTodo(updatedState.map((todo, index) => ({
+                ...todo,
+                completionOrder: todo.completed ? (index < toggledIndex ? todo.completionOrder : todo.completionOrder + 1) : todo.completionOrder
+            })));
+            return newState;
+        // return state.map((todo) => (todo.id === action.payload.id ? { ...todo, completed: !todo.completed } : todo));
         case REMOVE_ALL_ITEMS:
-            return [];
+            // return [];
+            return updateColorsOfCheckedTodo([]);
         case TOGGLE_ALL:
-            return state.map((todo) => (todo.completed !== action.payload.completed ? { ...todo, completed: action.payload.completed } : todo));
+            const allCompleted = action.payload.completed;
+            return updateColors(state.map(todo => ({ ...todo, completed: allCompleted })));
+        // return state.map((todo) => (todo.completed !== action.payload.completed ? { ...todo, completed: action.payload.completed } : todo));
         case REMOVE_COMPLETED_ITEMS:
-            return state.filter((todo) => !todo.completed);
+            return updateColors(state.filter((todo) => !todo.completed));
+        // return state.filter((todo) => !todo.completed);
     }
 
     throw Error(`Unknown action: ${action.type}`);

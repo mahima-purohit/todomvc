@@ -12,7 +12,11 @@ export const Item = memo(function Item({ todo, dispatch, index }) {
 	 * Task-1 Step-1: We used he useState hook to manage the color state of the todo item label and set it to "red" initially
 	 */
 	const [color, setColor] = useState("red");
-	const { title, completed, id } = todo;
+	/**
+	 * **************************TASK-2, STEP-3*********************
+	 * Extract the checkedColor property form the todo object and apply it on label
+	 */
+	const { title, completed, id, checkedColor } = todo;
 	/**
 	 * Task-1 Step-2:
 	 *  i) Used the useEffect hook to trigger actions when the component mounts or when the title of the todo item changes.
@@ -46,14 +50,14 @@ export const Item = memo(function Item({ todo, dispatch, index }) {
 			clearInterval(interval);
 		};
 	}, [title]);
-
+	//TASK-2
 	const toggleItem = useCallback(
 		() => dispatch({ type: TOGGLE_ITEM, payload: { id } }),
-		[dispatch]
+		[dispatch, id]
 	);
 	const removeItem = useCallback(
 		() => dispatch({ type: REMOVE_ITEM, payload: { id } }),
-		[dispatch]
+		[dispatch, id]
 	);
 	const updateItem = useCallback(
 		(id, title) => dispatch({ type: UPDATE_ITEM, payload: { id, title } }),
@@ -103,8 +107,14 @@ export const Item = memo(function Item({ todo, dispatch, index }) {
 							onChange={toggleItem}
 						/>
 						<label
-							//Task-1 Step-3: Rendered the todo item label with the dynamic color style.
-							style={{ color: color }}
+							/**
+                         * ******************TASK-1, STEP-3:*************************
+                            Rendered the todo item label with the dynamic color style.
+                         * ******************TASK-2, STEP-4:*************************
+                         * Change the label styling based on it's status of completion
+                         */
+							// style={{ color: color }}
+							style={{ color: completed ? checkedColor : color }}
 							data-testid="todo-item-label"
 							onDoubleClick={handleDoubleClick}
 						>
